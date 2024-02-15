@@ -19,46 +19,6 @@
 
 
 
-
-    <?php
-// include 'header.php'; // แทรก header ตามความต้องการ
-
-// ตรวจสอบว่ามีการส่งข้อมูลมาหรือไม่
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name']; // รับค่าจากฟอร์ม name
-    $urlContent = $_POST['editor1']; // รับค่าจาก CKEditor
-
-    // ตรวจสอบและสร้างโฟลเดอร์ถ้ายังไม่มี
-    $folderName = 'playerdata';
-    if (!file_exists($folderName)) {
-        mkdir($folderName, 0777, true); // สร้างโฟลเดอร์ด้วยสิทธิ์การเข้าถึงเต็มรูปแบบ
-    }
-
-    // สร้าง ID ที่ไม่ซ้ำกันสำหรับแต่ละไฟล์
-    do {
-        $uniqueID = substr(md5(mt_rand()), 0, 6); // สร้าง ID แบบสุ่ม 4 ตัวอักษร
-        $fileName = $folderName . '/' . $uniqueID . '.json'; // กำหนดชื่อไฟล์ด้วย ID และเส้นทางโฟลเดอร์
-    } while (file_exists($fileName)); // ทำซ้ำหากไฟล์ด้วย ID เดียวกันมีอยู่แล้ว
-
-    // สร้าง array ข้อมูล
-    $data = array(
-        "ID" => $uniqueID,
-        "Name" => $name,
-        "URL" => $urlContent
-    );
-
-    // แปลงข้อมูลเป็น JSON
-    $json_data = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-    // บันทึกข้อมูลลงในไฟล์ JSON โดยใช้ชื่อไฟล์ที่กำหนด
-    if(file_put_contents($fileName, $json_data)) {
-        echo "Data saved successfully to " . $fileName;
-    } else {
-        echo "Error saving data";
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html>
 <head>
