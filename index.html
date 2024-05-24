@@ -78,34 +78,47 @@
 <body>
 <div id='Zuika'></div>
 <script type="text/javascript">
-  var playerInstance = jwplayer('Zuika');
-  playerInstance.setup({
-    mute: false,
-    menu: false, // ปิดการใช้งานเมนู
-    allowscriptaccess: 'always',
-    wmode: 'opaque',
-    sources: [
-      {
-        file: "<?=$_GET['url']?>",
-        type: "hls"
-      }
-    ],
-    image: '',
-    width: '100%',
-    height: '100%',
-    autostart: true,
-    primary: 'html5'
-  });
+  function getQueryParam(param) {
+    var urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
 
-  // คอมเมนต์หรือลบโค้ดที่เพิ่มปุ่มดาวน์โหลด
-  // playerInstance.addButton(
-  //   '',
-  //   '', 
-  //   function() {  
-  //     window.open(playerInstance.getPlaylistItem()['file'], '_blank').blur();
-  //   },
-  //   'download'
-  // );
+  var id = getQueryParam('id');
+  if (id) {
+    var jsonUrl = 'https://streaming360.online/movie/tvmoviehd/data/' + id + '.json';
+    $.getJSON(jsonUrl, function(data) {
+      var playerInstance = jwplayer('Zuika');
+      playerInstance.setup({
+        mute: false,
+        menu: true,
+        allowscriptaccess: 'always',
+        wmode: 'opaque',
+        sources: [
+          {
+            file: data.m3u8_url,
+            type: "hls"
+          }
+        ],
+        image: '',
+        width: '100%',
+        height: '100%',
+        autostart: true,
+        primary: 'html5'
+      });
+      playerInstance.addButton(
+        '',
+        '',
+        function() {  
+          window.open(playerInstance.getPlaylistItem()['file'], '_blank').blur();
+        },
+        'download'
+      );
+    }).fail(function() {
+      document.getElementById('Zuika').innerText = 'Failed to load video data';
+    });
+  } else {
+    document.getElementById('Zuika').innerText = 'No video ID provided';
+  }
 </script>
 </body>
 </html>
