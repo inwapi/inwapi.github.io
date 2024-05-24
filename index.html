@@ -83,38 +83,42 @@
     return urlParams.get(param);
   }
 
-  var videoUrl = getQueryParam('url');
-  if (videoUrl) {
-    var playerInstance = jwplayer('Zuika');
-    playerInstance.setup({
-      mute: false,
-      menu: true,
-      allowscriptaccess: 'always',
-      wmode: 'opaque',
-      sources: [
-        {
-          file: videoUrl,
-          type: "hls"
-        }
-      ],
-      image: '',
-      width: '100%',
-      height: '100%',
-      autostart: true,
-      primary: 'html5'
+  var id = getQueryParam('id');
+  if (id) {
+    var jsonUrl = 'https://yourusername.github.io/yourrepositoryname/data/' + id + '.json';
+    $.getJSON(jsonUrl, function(data) {
+      var playerInstance = jwplayer('Zuika');
+      playerInstance.setup({
+        mute: false,
+        menu: true,
+        allowscriptaccess: 'always',
+        wmode: 'opaque',
+        sources: [
+          {
+            file: data.m3u8_url,
+            type: "hls"
+          }
+        ],
+        image: '',
+        width: '100%',
+        height: '100%',
+        autostart: true,
+        primary: 'html5'
+      });
+      playerInstance.addButton(
+        '',
+        '',
+        function() {  
+          window.open(playerInstance.getPlaylistItem()['file'], '_blank').blur();
+        },
+        'download'
+      );
+    }).fail(function() {
+      document.getElementById('Zuika').innerText = 'Failed to load video data';
     });
-    playerInstance.addButton(
-      '',
-      '',
-      function() {  
-        window.open(playerInstance.getPlaylistItem()['file'], '_blank').blur();
-      },
-      'download'
-    );
   } else {
-    document.getElementById('Zuika').innerText = 'No video URL provided';
+    document.getElementById('Zuika').innerText = 'No video ID provided';
   }
 </script>
 </body>
 </html>
-
