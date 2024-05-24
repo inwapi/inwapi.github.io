@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>HLS Player</title>
+<meta name="referrer" content="always">
+<meta name="referrer" content="no-referrer"/>
+<meta name="referrer" content="never"/>   
+<style type="text/css">
+  body, html {
+    padding: 0px;
+    margin: 0px;
+    background: #000000;
+  }
+</style>
+<script src="https://ssl.p.jwpcdn.com/player/v/8.1.3/jwplayer.js"></script>
+<script type="text/javascript">
+  jwplayer.key = "W7zSm81+mmIsg7F+fyHRKhF3ggLkTqtGMhvI92kbqf/ysE99";
+</script>
+<script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
+<style type="text/css">
+  #Zuika {
+    width: 100%!important;
+    height: 100%!important;
+    overflow: hidden;
+    position: absolute;
+  }
+  .Zuika-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+    background-color: #000;
+  }
+  .Zuika-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  .embed-responsive {
+    position: relative;
+    display: block;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .embed-responsive .embed-responsive-item,
+  .embed-responsive embed,
+  .embed-responsive iframe,
+  .embed-responsive object,
+  .embed-responsive video {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .embed-responsive-16by9 {
+    padding-bottom: 56.25%;
+  }
+  body {
+    background-size: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: #000000;
+    height: auto;
+    width: 100%;
+    margin: 0px;
+    padding: 0;
+  }
+</style>
+</head>
+<body>
+<div id='Zuika'></div>
+<script type="text/javascript">
+  // Function to get query parameter by name
+  function getQueryParam(param) {
+    var urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  // Function to fetch JSON data and setup JW Player
+  async function fetchAndPlay() {
+    try {
+      // Get the id from query string
+      const id = getQueryParam('id');
+      if (!id) {
+        document.getElementById('Zuika').innerText = 'No ID provided';
+        return;
+      }
+
+      // Use a proxy server to avoid CORS issues
+      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+      const targetUrl = `https://streaming360.online/movie/tvmoviehd/data/${id}.json`;
+      const response = await fetch(proxyUrl + targetUrl);
+      const jsonData = await response.json();
+      
+      // Extract the m3u8_url from the JSON data
+      const videoUrl = jsonData.m3u8_url;
+
+      // Setup JW Player with the m3u8_url
+      if (videoUrl) {
+        const playerInstance = jwplayer('Zuika');
+        playerInstance.setup({
+          mute: false,
+          menu: true,
+          allowscriptaccess: 'always',
+          wmode: 'opaque',
+          sources: [
+            {
+              file: videoUrl,
+              type: "hls"
+            }
+          ],
+          image: '',
+          width: '100%',
+          height: '100%',
+          autostart: true,
+          primary: 'html5'
+        });
+        playerInstance.addButton(
+          '',
+          '',
+          function() {  
+            window.open(playerInstance.getPlaylistItem()['file'], '_blank').blur();
+          },
+          'download'
+        );
+      } else {
+        document.getElementById('Zuika').innerText = 'No video URL provided';
+      }
+    } catch (error) {
+      console.error('Error fetching JSON data:', error);
+      document.getElementById('Zuika').innerText = 'Failed to load video';
+    }
+  }
+
+  // Call the function to fetch JSON data and play the video
+  fetchAndPlay();
+</script>
+</body>
+</html>
